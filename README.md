@@ -14,11 +14,11 @@ options:
   -h, --help            show this help message and exit
   --port PORT, -p PORT  Serial port device
   --baud BAUD, -b BAUD  Set Baud
-usage: WrFlash_phy6202 [-h] [--port PORT] [--baud BAUD] [--chiperase]
-                       address filename
 ```
 
 ```
+usage: WrFlash_phy6202 [-h] [--port PORT] [--baud BAUD] [--chiperase]
+                       address filename
 WrFlash-PHY6202 Utility version 07.12.19
 
 positional arguments:
