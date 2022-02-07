@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # rdreg_phy6202.py 30.11.2019 pvvx #
 
@@ -78,7 +78,7 @@ def main():
 		baud = args.baud;
 		print('Reopen %s port %i baud' % (args.port, baud))
 		pkt = "uarts%i" % baud
-		sent = serialPort.write(pkt);
+		sent = serialPort.write(pkt.encode());
 		byteSent += sent;
 		serialPort.timeout = 1
 # 012
@@ -110,7 +110,8 @@ def main():
 		if args.size > 128 and addr&127 == 0:
 			print('\rRead 0x%08x...' % addr),
 			sys.stdout.flush()
-		sent = serialPort.write("rdreg%08x" % addr);
+		txt = "rdreg%08x" % addr;
+		sent = serialPort.write(txt.encode());
 		byteSent += sent;
 # 01234567890123456
 # =0x1fff3710#OK>>:		

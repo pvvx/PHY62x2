@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # wrflash_phy6202.py 07.12.2019 pvvx #
 
@@ -32,7 +32,7 @@ class phyflasher:
 	def SetAutoErase(self, enable = True):
 		self.autoerase = enable
 	def tstconnect(self):
-		self._port.write('getver ');
+		self._port.write(str.encode('getver '));
 		read = self._port.read(6);
 		if read == '#ER>>:' :
 			print ('PHY6202 - connected Ok')
@@ -41,7 +41,7 @@ class phyflasher:
 	def SetBaud(self, baud):
 		if self.baud != baud:
 			print ('Reopen %s port %i baud...' % (self.port, baud)),
-			self._port.write("uarts%i" % baud);
+			self._port.write(str.encode("uarts%i" % baud));
 			self._port.timeout = 1
 			read = self._port.read(3);
 			if read == '#OK':
@@ -79,7 +79,7 @@ class phyflasher:
 		print ('Erase sector Flash at 0x%08x...' % offset),
 		if offset < PHY_FLASH_ZONE:
 			offset |= 0x400000
-		self._port.write('era4k %X' % offset),
+		self._port.write(str.encode('era4k %X' % offset)),
 		tmp = self._port.timeout
 		self._port.timeout = 0.5
 		read = self._port.read(6)
@@ -93,7 +93,7 @@ class phyflasher:
 		print ('Erase block 32k Flash at 0x%08x...' % offset),
 		if offset < PHY_FLASH_ZONE:
 			offset |= 0x400000
-		self._port.write('er32k %X' % offset)
+		self._port.write(str.encode('er32k %X' % offset))
 		tmp = self._port.timeout
 		self._port.timeout = 1
 		read = self._port.read(6)
@@ -105,7 +105,7 @@ class phyflasher:
 		return True
 	def cmd_era64k(self, offset):
 		print ('Erase block 64k Flash at 0x%08x...' % offset),
-		self._port.write('er64k %X' % offset)
+		self._port.write(str.encode('er64k %X' % offset))
 		tmp = self._port.timeout
 		self._port.timeout = 2
 		read = self._port.read(6)
@@ -117,7 +117,7 @@ class phyflasher:
 		return True
 	def cmd_er256(self, offset):
 		print ('Erase block 256k Flash at 0x%08x...' % offset),
-		self._port.write('er256 %X' % offset)
+		self._port.write(str.encode('er256 %X' % offset))
 		tmp = self._port.timeout
 		self._port.timeout = 2
 		read = self._port.read(6)
@@ -129,7 +129,7 @@ class phyflasher:
 		return True
 	def cmd_er512(self, offset):
 		print ('Erase block 512k Flash at 0x%08x...' % offset),
-		self._port.write('er512 %X' % offset)
+		self._port.write(str.encode('er512 %X' % offset))
 		tmp = self._port.timeout
 		self._port.timeout = 3
 		read = self._port.read(6)
@@ -141,7 +141,7 @@ class phyflasher:
 		return True
 	def cmd_erase_all_chipf(self):
 		print ('Erase All Chip Flash...'),
-		self._port.write('chipf ')
+		self._port.write(str.encode('chipf '))
 		tmp = self._port.timeout
 		self._port.timeout = 7
 		read = self._port.read(6)
@@ -192,12 +192,12 @@ class phyflasher:
 		self._port.timeout = 1
 		print ('Write 0x%08x bytes to Flash at 0x%08x...' % (size, offset)),
 		if blknum == 0:  
-			self._port.write('cpnum %d ' % blkcnt)
+			self._port.write(str.encode('cpnum %d ' % blkcnt))
 			read = self._port.read(6)
 			if read != '#OK>>:':
 				print ('error!')
 				return False
-		self._port.write('cpbin %d %X %X %X' % (blknum, offset, size, 0x1FFF0000+offset))
+		self._port.write(str.encode('cpbin %d %X %X %X' % (blknum, offset, size, 0x1FFF0000+offset)))
 		read = self._port.read(13)
 		if read != 'by hex mode: ':
 			print ('error!')
@@ -244,7 +244,7 @@ class phyflasher:
 			while(offset < end_sector):
 				dwx, = struct.unpack('<I', stream.read(4))
 				if dwx != 0xffffffff:
-					self._port.write('write%X %X' % (offset, dwx))
+					self._port.write(str.encode('write%X %X' % (offset, dwx)))
 					read = self._port.read(6)
 					if read != '#OK>>:':
 						print ('error!')
