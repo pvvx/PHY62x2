@@ -33,7 +33,7 @@ usage: WrFlash_phy6202 [-h] [--port PORT] [--baud BAUD] [--chiperase]
 WrFlash-PHY6202 Utility version 07.12.19
 
 positional arguments:
-  address               Start address
+  address               Start Flash address
   filename              File name
 
 options:
@@ -41,4 +41,16 @@ options:
   --port PORT, -p PORT  Serial port device
   --baud BAUD, -b BAUD  Set Port Baud (115200, 250000, 500000, 1000000)
   --chiperase, -c       All Chip Erase
+```
+
+### Read all Flash
+
+```
+python3 rdreg_phy6202.py -p COM5 -b 1000000 0x11000000 0x80000
+```
+
+### Write all Flash
+
+```
+python3 write_phy6202.py -p COM18 -c -b 500000 0 r11000000-00080000.bin
 ```

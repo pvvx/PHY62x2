@@ -71,9 +71,12 @@ def main():
 # 012345
 # cmd>>:	
 	read = serialPort.read(6);
-	byteRead += len(read);
-	if read == 'cmd>>:' :
-		print('PHY6202 - Reset Ok')
+	if read != b'cmd>>:' :
+		print('PHY6202 - Error Reset!')
+		print('Check connection RTS->RSTN, DTR->TM, TX->RX, RX<-TX and Chip Power!')
+		serialPort.close()
+		exit(4)
+	print('PHY6202 - Reset Ok')
 	if baud != args.baud:
 		baud = args.baud;
 		print('Reopen %s port %i baud' % (args.port, baud))
@@ -84,8 +87,8 @@ def main():
 # 012
 # #OK
 		read = serialPort.read(3);
-		print('%s' % read)
-		if read == '#OK':
+		#print(read)
+		if read == b'#OK':
 			serialPort.close()
 			serialPort.baudrate = baud
 			serialPort.open();
@@ -95,7 +98,7 @@ def main():
 			exit(3)
 		
 	serialPort.timeout = 0.1
-	print('Start address: 0x%08x, length: 0x%08x ...' % (addr, length))
+	print('Start address: 0x%08x, length: 0x%08x' % (addr, length))
 
 	filename = "r%08x-%08x.bin" % (addr, length)
 	try:
@@ -108,7 +111,7 @@ def main():
 	t1 = time.time()
 	while length > 0:
 		if args.size > 128 and addr&127 == 0:
-			print('\rRead 0x%08x...' % addr),
+			print('\rRead 0x%08x...' % addr, end = ' '),
 			sys.stdout.flush()
 		txt = "rdreg%08x" % addr;
 		sent = serialPort.write(txt.encode());
@@ -117,7 +120,7 @@ def main():
 # =0x1fff3710#OK>>:		
 		read = serialPort.read(17);
 		byteRead += len(read);
-		if read[0:3] == '=0x' and read[11:17] == '#OK>>:':
+		if read[0:3] == b'=0x' and read[11:17] == b'#OK>>:':
 			dw = struct.pack('<I', int(read[1:11], 16))
 			ff.write(dw);
 			byteSaved +=len(dw);

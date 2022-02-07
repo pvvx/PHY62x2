@@ -34,17 +34,17 @@ class phyflasher:
 	def tstconnect(self):
 		self._port.write(str.encode('getver '));
 		read = self._port.read(6);
-		if read == '#ER>>:' :
+		if read == b'#ER>>:' :
 			print ('PHY6202 - connected Ok')
 			return True
 		return False
 	def SetBaud(self, baud):
 		if self.baud != baud:
-			print ('Reopen %s port %i baud...' % (self.port, baud)),
+			print ('Reopen %s port %i baud...' % (self.port, baud), end = ' '),
 			self._port.write(str.encode("uarts%i" % baud));
 			self._port.timeout = 1
 			read = self._port.read(3);
-			if read == '#OK':
+			if read == b'#OK':
 				print ('ok')
 				self._port.close()
 				self.baud = baud
@@ -67,7 +67,7 @@ class phyflasher:
 		self._port.setRTS(False) #RSTN (hi)
 		self._port.timeout = 0.1
 		read = self._port.read(6);
-		if read == 'cmd>>:' :
+		if read == b'cmd>>:' :
 			print ('PHY6202 - Reset Ok')
 			return self.SetBaud(baud)
 		if self.tstconnect():
@@ -76,76 +76,76 @@ class phyflasher:
 		self._port.close()
 		sys.exit(3)
 	def cmd_era4k(self, offset):
-		print ('Erase sector Flash at 0x%08x...' % offset),
+		print ('Erase sector Flash at 0x%08x...' % offset, end = ' ')
 		if offset < PHY_FLASH_ZONE:
 			offset |= 0x400000
 		self._port.write(str.encode('era4k %X' % offset)),
 		tmp = self._port.timeout
 		self._port.timeout = 0.5
 		read = self._port.read(6)
-		if read != '#OK>>:':
+		if read != b'#OK>>:':
 			print ('error!')
 			return False
 		print ('ok')
 		self._port.timeout = tmp
 		return True
 	def cmd_era32k(self, offset):
-		print ('Erase block 32k Flash at 0x%08x...' % offset),
+		print ('Erase block 32k Flash at 0x%08x...' % offset, end = ' '),
 		if offset < PHY_FLASH_ZONE:
 			offset |= 0x400000
 		self._port.write(str.encode('er32k %X' % offset))
 		tmp = self._port.timeout
 		self._port.timeout = 1
 		read = self._port.read(6)
-		if read != '#OK>>:':
+		if read != b'#OK>>:':
 			print ('error!')
 			return False
 		print ('ok')
 		self._port.timeout = tmp
 		return True
 	def cmd_era64k(self, offset):
-		print ('Erase block 64k Flash at 0x%08x...' % offset),
+		print ('Erase block 64k Flash at 0x%08x...' % offset, end = ' '),
 		self._port.write(str.encode('er64k %X' % offset))
 		tmp = self._port.timeout
 		self._port.timeout = 2
 		read = self._port.read(6)
-		if read != '#OK>>:':
+		if read != b'#OK>>:':
 			print ('error!')
 			return False
 		print ('ok')
 		self._port.timeout = tmp
 		return True
 	def cmd_er256(self, offset):
-		print ('Erase block 256k Flash at 0x%08x...' % offset),
+		print ('Erase block 256k Flash at 0x%08x...' % offset, end = ' '),
 		self._port.write(str.encode('er256 %X' % offset))
 		tmp = self._port.timeout
 		self._port.timeout = 2
 		read = self._port.read(6)
-		if read != '#OK>>:':
+		if read != b'#OK>>:':
 			print ('error!')
 			return False
 		print ('ok')
 		self._port.timeout = tmp
 		return True
 	def cmd_er512(self, offset):
-		print ('Erase block 512k Flash at 0x%08x...' % offset),
+		print ('Erase block 512k Flash at 0x%08x...' % offset, end = ' '),
 		self._port.write(str.encode('er512 %X' % offset))
 		tmp = self._port.timeout
 		self._port.timeout = 3
 		read = self._port.read(6)
-		if read != '#OK>>:':
+		if read != b'#OK>>:':
 			print ('error!')
 			return False
 		print ('ok')
 		self._port.timeout = tmp
 		return True
 	def cmd_erase_all_chipf(self):
-		print ('Erase All Chip Flash...'),
+		print ('Erase All Chip Flash...', end = ' '),
 		self._port.write(str.encode('chipf '))
 		tmp = self._port.timeout
 		self._port.timeout = 7
 		read = self._port.read(6)
-		if read != '#OK>>:':
+		if read != b'#OK>>:':
 			print ('error!')
 			return False
 		print ('ok')
@@ -190,28 +190,28 @@ class phyflasher:
 		return True
 	def send_blk(self, stream, offset, size, blkcnt, blknum):
 		self._port.timeout = 1
-		print ('Write 0x%08x bytes to Flash at 0x%08x...' % (size, offset)),
+		print ('Write 0x%08x bytes to Flash at 0x%08x...' % (size, offset), end = ' '),
 		if blknum == 0:  
 			self._port.write(str.encode('cpnum %d ' % blkcnt))
 			read = self._port.read(6)
-			if read != '#OK>>:':
+			if read != b'#OK>>:':
 				print ('error!')
 				return False
 		self._port.write(str.encode('cpbin %d %X %X %X' % (blknum, offset, size, 0x1FFF0000+offset)))
 		read = self._port.read(13)
-		if read != 'by hex mode: ':
+		if read != b'by hex mode: ':
 			print ('error!')
 			return False
 		data = stream.read(size)
 		self._port.write(data)
 		read = self._port.read(23); #'checksum is: 0x00001d1e'
-		print ('%s' % read),
-		if read[0:15] != 'checksum is: 0x':
+		#print ('%s' % read),
+		if read[0:15] != b'checksum is: 0x':
 			print ('error!')
 			return False
 		self._port.write(read[15:])
 		read = self._port.read(6)
-		if read != '#OK>>:':
+		if read != b'#OK>>:':
 			print ('error!')
 			return False
 		print ('ok')
@@ -240,13 +240,13 @@ class phyflasher:
 				return False
 			end_sector = (offset & PHY_FLASH_SECTOR_MASK) + PHY_FLASH_SECTOR_SIZE
 			sblk = end_sector - offset
-			print ('Write 0x%08x bytes to Flash at 0x%08x...' % (sblk, offset)),
+			print ('Write 0x%08x bytes to Flash at 0x%08x...' % (sblk, offset), end = ' '),
 			while(offset < end_sector):
 				dwx, = struct.unpack('<I', stream.read(4))
 				if dwx != 0xffffffff:
 					self._port.write(str.encode('write%X %X' % (offset, dwx)))
 					read = self._port.read(6)
-					if read != '#OK>>:':
+					if read != b'#OK>>:':
 						print ('error!')
 						return False
 				offset+=4
@@ -271,7 +271,7 @@ def main():
 	parser.add_argument('--port', '-p', help='Serial port device',	default='COM1');
 	parser.add_argument('--baud', '-b',	help='Set Port Baud (115200, 250000, 500000, 1000000)',	type=arg_auto_int, default=DEF_RUN_BAUD);
 	parser.add_argument('--chiperase', '-c',  action='store_true', help='All Chip Erase');
-	parser.add_argument('address', help='Start address', type=arg_auto_int)
+	parser.add_argument('address', help='Start Flash address', type=arg_auto_int)
 	parser.add_argument('filename', help='File name')
 	
 	args = parser.parse_args()
@@ -281,7 +281,7 @@ def main():
 	phy = phyflasher(args.port)
 	print ('Connecting...')
 	if phy.Connect(args.baud):
-		stream = file(args.filename, 'rb')
+		stream = open(args.filename, 'rb')
 		size = os.path.getsize(args.filename)
 		if size < 1:
 			stream.close
