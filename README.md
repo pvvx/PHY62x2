@@ -1,5 +1,16 @@
 Utils for PHU62x2
 
+### Pins: USB-COM / Board
+
+DTR->TM
+
+RTS->RSTN
+
+TX->RX
+
+RX<-TX
+
+### Usage
 
 ```
 usage: rdreg_phy6202 [-h] [--port PORT] [--baud BAUD] address size
