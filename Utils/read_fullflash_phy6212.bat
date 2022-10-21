@@ -1,0 +1,1 @@
+python3.exe rdreg_phy6212.py -p COM4 -b 1000000 0x10000000 0x20000
