@@ -40,7 +40,7 @@ def main():
 	args = parser.parse_args()
 
 	baud = 115200;
-	print('RdRegs-PHY6202 Utility version %s' % __version__)
+	print('RdRegs-PHY62x2 Utility version %s' % __version__)
 	try:
 		serialPort = serial.Serial(args.port, baud, \
 								   serial.EIGHTBITS,\
@@ -72,11 +72,11 @@ def main():
 # cmd>>:	
 	read = serialPort.read(6);
 	if read != b'cmd>>:' :
-		print('PHY6202 - Error Reset!')
+		print('PHY62x2 - Error Reset!')
 		print('Check connection RTS->RSTN, DTR->TM, TX->RX, RX<-TX and Chip Power!')
 		serialPort.close()
 		exit(4)
-	print('PHY6202 - Reset Ok')
+	print('PHY62x2 - Reset Ok')
 	if baud != args.baud:
 		baud = args.baud;
 		print('Reopen %s port %i baud' % (args.port, baud))
@@ -91,8 +91,15 @@ def main():
 		serialPort.close()
 		serialPort.baudrate = baud
 		serialPort.open();
-		
+	
+	serialPort.write(str.encode("rdrev"));
 	serialPort.timeout = 0.1
+	read = serialPort.read(16);
+	if read[0:2] == b'0x' and read[10:16] == b'#OK>>:':
+		print('Revision:', read[0:10])
+	else:
+		print('Error read Revision!')
+		exit(2)
 	print('Start address: 0x%08x, length: 0x%08x' % (addr, length))
 
 	filename = "r%08x-%08x.bin" % (addr, length)
