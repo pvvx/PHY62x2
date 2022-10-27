@@ -1,0 +1,1 @@
+python3.exe rdreg_phy6212.py -p COM4 0x11000000 0x80000
