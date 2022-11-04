@@ -1,4 +1,4 @@
-Utils for PHU62x2
+Utils for PHY62x2
 
 ### Pins: USB-COM / Board
 
