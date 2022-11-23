@@ -1,0 +1,1 @@
+@python3.exe rdreg_phy6252.py -p COM21 -b 1000000 0x10000000 0x00020000
