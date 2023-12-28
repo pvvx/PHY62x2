@@ -1,0 +1,1 @@
+@python3.exe WrFlash_phy6222.py -p COM11 -b 1000000 0 ff_r11000000-00080000.bin
