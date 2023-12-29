@@ -18,7 +18,7 @@ PHY_FLASH_SECTOR_SIZE = 4096
 PHY_FLASH_SECTOR_MASK = 0xfffff000
 PHY_WR_BLK_SIZE = 0x2000
 
-__version__ = "28.12.23"
+__version__ = "29.12.23"
 
 class phyflasher:
 	def __init__(self, port='COM1'):
@@ -212,20 +212,22 @@ class phyflasher:
 	def cmd_erase_all_flash(self):
 		print ('Erase All Chip Flash...', end = ' '),
 		if self.wr_flash_cmd(6) and self.wr_flash_cmd(0x60): #Write Enable, Chip Erase
+			time.sleep(7)
 			print ('ok')
 			return True
+		print ('error!')
 		return False
 	def EraseSectorsFlash(self, offset = 0, size = MAX_FLASH_SIZE):
 		count = int((size + PHY_FLASH_SECTOR_SIZE - 1) / PHY_FLASH_SECTOR_SIZE)
 		offset &= PHY_FLASH_SECTOR_MASK
 		if count > 0 and count < 0x10000 and offset >= 0: # 1 byte .. 16 Mbytes
 			while count > 0:
-				if (offset & 0x7FFFF) == 0 and count > 127:
-					if not self.cmd_er512(offset):
-						return False
-					offset += 0x80000
-					count-=128
-				elif (offset & 0x0FFFF) == 0 and count > 15:
+				#if (offset & 0x7FFFF) == 0 and count > 127:
+				#	if not self.cmd_er512(offset):
+				#		return False
+				#	offset += 0x80000
+				#	count-=128
+				if (offset & 0x0FFFF) == 0 and count > 15:
 					if not self.cmd_era64k(offset):
 						return False
 					offset += 0x10000
@@ -339,7 +341,7 @@ def main():
 					sys.exit(3)
 			else:
 				if args.erase == True:
-					if not cmd_erase_all_chipf():
+					if not phy.cmd_erase_all_chipf():
 						stream.close
 						print ('Error: Clear Flash!')
 						sys.exit(3)
