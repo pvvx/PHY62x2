@@ -1,1 +1,1 @@
-@python3.exe rdreg_phy6252.py -p COM21 -b 1000000 0x10000000 0x00020000
+@python3.exe rdwr_phy62x2.py -p COM14 -b 1000000 rc 0x10000000 0x00020000 rom_phy6252.bin
